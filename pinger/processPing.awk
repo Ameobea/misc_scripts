@@ -1,5 +1,5 @@
 {
-  if($0 ~ "no answer yet"){
+  if($0 ~ "100% packet loss"){
     print("-1")
   }else{
     split($0,ping1,"time=")
