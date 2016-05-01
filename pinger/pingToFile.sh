@@ -1,7 +1,7 @@
 # Configure these two lines below before running script:
-HOSTIP=yahoo.com # IP of what we're pinging
+HOSTIP=67.186.97.226 # IP of what we're pinging
 OUTPUTFILE=./out.txt # Name of the file where results are output
-MAXPING=30 # Pings that are higher than this are recorded to file.
+MAXPING=200 # Pings that are higher than this are recorded to file.
 
 while [ 1 -gt 0 ]
 do
@@ -13,7 +13,6 @@ do
     echo "Unable to reach host at $DATE"
   else
     COMP=$(echo "$RESULT>$MAXPING" | bc -l)
-    echo "$RESULT"
 
     if [ "$COMP" -gt "0" ]
       then
