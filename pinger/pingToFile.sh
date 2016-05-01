@@ -5,7 +5,7 @@ MAXPING=10 # Pings that are higher than this are recorded to file.
 
 while [ 1 -gt 0 ]
 do
-  RESULT=`ping -D -O -c 1 $HOSTIP | awk -W interactive -f processPing.awk`
+  RESULT=`ping -D -O -c 1 $HOSTIP | awk -W interactive -f processPing.awk | xargs`
   DATE=`date`
 
   if [ "$RESULT" = "-1" ]
