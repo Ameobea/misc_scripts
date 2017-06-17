@@ -1,0 +1,13 @@
+#!/bin/sh
+
+# Uploads a file to AmeoTrack.  By default, it's set to be public and never expire.
+
+RES=$(curl -s -F "password=$AMEOTRACK_PASSWORD" -F "file=@`pwd`/$1" https://ameo.link/u/upload)
+
+# Copy the link to the clipboard
+echo $RES | xsel --clipboard
+
+GREEN='\033[1;32m'
+NC='\033[0m' # No Color
+echo "${GREEN}File successfully uploaded: $NC$RES"
+echo "Link has been copied to the clipboard."
