@@ -2,6 +2,16 @@
 
 # Uploads a file to AmeoTrack.  By default, it's set to be public and never expire.
 
+if ! [ $AMEOTRACK_PASSWORD ]; then
+	echo "AmeoTrack image uploader password must be exported under the \`AMEOTRACK_PASSWORD\` environment variable to use this tool."
+	exit 1
+fi
+
+if ! [ $1 ]; then
+  echo "Usage: \`atu file.png\`"
+	exit 1 
+fi
+
 RES=$(curl -s -F "password=$AMEOTRACK_PASSWORD" -F "file=@`pwd`/$1" https://ameo.link/u/upload)
 
 # Copy the link to the clipboard
