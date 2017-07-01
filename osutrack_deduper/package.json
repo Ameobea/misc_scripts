@@ -1,0 +1,12 @@
+{
+  "name": "osutrack_dedup",
+  "version": "0.1.0",
+  "description": "A tool to delete useless update rows from the osu!track database",
+  "main": "index.js",
+  "author": "Casey Primozic <me@ameo.link>",
+  "license": "MIT",
+  "dependencies": {
+    "lodash": "^4.17.4",
+    "mysql": "^2.13.0"
+  }
+}
