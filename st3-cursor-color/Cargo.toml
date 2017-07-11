@@ -2,6 +2,11 @@
 authors = ["Casey Primozic <me@ameo.link>"]
 name = "st3-cursor-color"
 version = "0.1.0"
+description = "A small utility to automatically change the cursor color of a Sublime Text 3 theme based on the current date."
+license = "MIT"
+keywords = ["Sublime", "Text", "Cursor", "Color", "Changer"]
+repository = "https://github.com/Ameobea/misc_scripts"
+homepage = "https://github.com/Ameobea/misc_scripts/tree/master/st3-cursor-color"
 
 [dependencies]
 chrono = "0.4.0"
