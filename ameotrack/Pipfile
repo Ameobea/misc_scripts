@@ -1,0 +1,16 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+toml = "~=0.10"
+click = "~=7.0"
+requests = "~=2.20"
+termcolor = "~=1.1"
+pyperclip = "~=1.7"
+
+[dev-packages]
+
+[requires]
+python_version = "3.6"
