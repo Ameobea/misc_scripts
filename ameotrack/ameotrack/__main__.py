@@ -9,7 +9,7 @@ import requests
 from termcolor import colored
 import pyperclip
 
-from config import load_conf, CONF_FILE_PATH
+from .config import load_conf, CONF_FILE_PATH
 
 STATE = None
 
