@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "22093911c16c18618ace337bc946b6de8a0c04cfdc82f55f17e1ec68fd420c34"
+            "sha256": "4ea79bfd73cf3630008b53c7072f33191aa4ea88a5878bfd15b281907ac49c11"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -16,12 +16,6 @@
         ]
     },
     "default": {
-        "ameotrack": {
-            "editable": true,
-            "git": "https://github.com/Ameobea/misc_scripts.git",
-            "ref": "a8acdcef80d8c7911ed6d0ca0c6ea45b0addd0f0",
-            "subdirectory": "ameotrack"
-        },
         "certifi": {
             "hashes": [
                 "sha256:339dc09518b07e2fa7eda5450740925974815557727d6bd35d319c1524a04a4c",

@@ -124,8 +124,8 @@ def upload(one_time, private, expiry, file: Path):
             multipart_data={"file": (str(file), f)},
             form_data={
                 "expiry": str(expiry or -1),
-                "secret": "" if private else "1",
-                "oneTime": "" if one_time else "1",
+                "secret": "1" if private else "",
+                "oneTime": "1" if one_time else "",
                 "password": STATE.conf["upload_password"],
                 "source": "at-cli",
             },

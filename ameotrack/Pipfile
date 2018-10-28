@@ -9,7 +9,6 @@ click = "~=7.0"
 requests = "~=2.20"
 termcolor = "~=1.1"
 pyperclip = "~=1.7"
-ameotrack = {editable = true, subdirectory = "ameotrack", git = "https://github.com/Ameobea/misc_scripts.git"}
 
 [dev-packages]
 
