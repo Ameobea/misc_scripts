@@ -137,9 +137,21 @@ def upload(one_time, private, expiry, file: Path):
 
 
 @main.command()
+@click.option(
+    "--timestamp",
+    "-t",
+    help="Include a timestamp at the end of the reminder of when the reminder was set",
+    is_flag=True,
+    default=False,
+)
 @click.argument("date", type=click.STRING)
 @click.argument("message", type=click.STRING)
-def remind(date, message):
+def remind(timestamp, date, message):
+    if timestamp:
+        time_str = datetime.now().strftime("%Y-%m-%d %X")
+        suffix = f"\nSent at {time_str}"
+        message += suffix
+
     res = STATE.api_call("remind", params={"dateString": date, "message": message})
     try:
         res = json.loads(res)
@@ -151,7 +163,6 @@ def remind(date, message):
         tdelta = delivery_dt - datetime.utcnow()
         tdelta_fmt = td_format(tdelta)
         print_success("Reminder successfully created; will be sent in:", tdelta_fmt)
-
     except json.JSONDecodeError:
         print_err("Received bad response from server:", res.text)
 
