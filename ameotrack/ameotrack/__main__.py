@@ -2,6 +2,7 @@ import traceback
 from pathlib import Path
 from datetime import datetime, timedelta
 import json
+import re
 from functools import partial
 
 import click
@@ -81,13 +82,14 @@ class AppState(object):
 
 class Commands(click.Group):
     def list_commands(self, ctx):
-        return ["upload", "remind"]
+        return ["upload", "remind", "bin"]
 
     def get_command(self, ctx, cmd_name):
         if not cmd_name:
             print_help()
 
-        matches = [x for x in self.list_commands(ctx) if x.startswith(cmd_name)]
+        commands = self.list_commands(ctx)
+        matches = [x for x in commands if x.startswith(cmd_name)]
         if not matches:
             return None
         elif len(matches) == 1:
@@ -121,7 +123,7 @@ def upload(one_time, private, expiry, file: Path):
         url = STATE.api_call(
             "upload",
             method="POST",
-            multipart_data={"file": (str(file), f)},
+            multipart_data={"file": ("file.txt", f)},
             form_data={
                 "expiry": str(expiry or -1),
                 "secret": "1" if private else "",
@@ -164,7 +166,41 @@ def remind(timestamp, date, message):
         tdelta_fmt = td_format(tdelta)
         print_success("Reminder successfully created; will be sent in:", tdelta_fmt)
     except json.JSONDecodeError:
-        print_err("Received bad response from server:", res.text)
+        print_err("Received bad response from server:", res)
+
+
+@main.command(name="bin")
+@click.option(
+    "--secret",
+    "-s",
+    is_flag=True,
+    default=False,
+    help="Use a long, unguessable URL for the generated bin",
+)
+@click.argument("password", type=click.STRING)
+@click.argument("file_path", type=click.Path(exists=True, dir_okay=False))
+def create_bin(password: str, file_path, secret: bool):
+    text = ""
+    filename = click.format_filename(file_path, shorten=True)
+
+    with open(file_path, "r", encoding="utf-8") as f:
+        text = f.read()
+
+    form_data = {"filename": filename, "password": password, "text": text}
+    if secret:
+        form_data["secret"] = "1"
+
+    res = STATE.api_call("bin", method="POST", form_data=form_data)
+    bin_name_rgx = re.compile('; url=\.(.*)"')
+    match = bin_name_rgx.search(res)
+    if not match:
+        print_err("Received bad response from server:", res)
+        exit(1)
+
+    bin_url = "{}{}".format(STATE.conf["ameotrack_url_root"], match.groups()[0])
+    pyperclip.copy(bin_url)
+    print_success("Bin successfully created:", bin_url)
+    print("Link has been copied to the clipboard.")
 
 
 # TODO: List reminders, delete/modify images, phost integration(?)
