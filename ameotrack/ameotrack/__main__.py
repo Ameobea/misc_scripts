@@ -117,13 +117,13 @@ def main(config):
 @click.option("--one-time", "-o", is_flag=True, default=False)
 @click.option("--private", "-p", is_flag=True, default=False)
 @click.option("--expiry", "-e", type=click.IntRange(1, None))
-@click.argument("file", type=click.Path(exists=True))
-def upload(one_time, private, expiry, file: Path):
-    with open(file, "rb") as f:
+@click.argument("filename", type=click.Path(exists=True))
+def upload(one_time, private, expiry, filename: Path):
+    with open(filename, "rb") as f:
         url = STATE.api_call(
             "upload",
             method="POST",
-            multipart_data={"file": ("file.txt", f)},
+            multipart_data={"file": (filename, f)},
             form_data={
                 "expiry": str(expiry or -1),
                 "secret": "1" if private else "",
