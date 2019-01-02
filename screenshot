@@ -2,5 +2,5 @@
 
 FILENAME="$HOME/Pictures/screenshots/$(date +%Y-%m-%d_%H-%M-%S).png"
 touch $FILENAME
-cat - > $FILENAME
+flameshot gui -r > $FILENAME
 ameotrack upload $FILENAME $@
