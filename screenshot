@@ -1,0 +1,6 @@
+#!/bin/bash
+
+FILENAME="$HOME/Pictures/screenshots/$(date +%Y-%m-%d_%H-%M-%S).png"
+touch $FILENAME
+cat - > $FILENAME
+ameotrack upload $FILENAME $@
