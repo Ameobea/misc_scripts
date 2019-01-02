@@ -1,0 +1,9 @@
+{
+  "name": "gallery",
+  "short_name": "gallery",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#fff",
+  "theme_color": "#673ab8"
+}
