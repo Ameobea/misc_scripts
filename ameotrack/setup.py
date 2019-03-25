@@ -11,6 +11,7 @@ setup(
         "toml~=0.10",
         "termcolor~=1.1",
         "pyperclip~=1.7",
+        "requests-toolbelt"
     ],
     license="MIT",
     url="https://github.com/Ameobea/misc_scripts/tree/master/ameotrack",
