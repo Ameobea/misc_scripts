@@ -9,8 +9,9 @@ click = "~=7.0"
 requests = "~=2.20"
 termcolor = "~=1.1"
 pyperclip = "~=1.7"
+requests-toolbelt = "*"
 
 [dev-packages]
 
 [requires]
-python_version = "3.6"
+python_version = "3.7"

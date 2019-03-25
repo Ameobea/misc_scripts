@@ -4,9 +4,11 @@ from datetime import datetime, timedelta
 import json
 import re
 from functools import partial
+import os
 
 import click
 import requests
+from requests_toolbelt.multipart.encoder import MultipartEncoder
 from termcolor import colored
 import pyperclip
 
@@ -57,7 +59,14 @@ class AppState(object):
         self.conf = load_conf(conf_file)
 
     def make_request(
-        self, method: str, *args, params={}, json_body=None, form_data=None, multipart_data=None
+        self,
+        method: str,
+        *args,
+        params={},
+        json_body=None,
+        form_data=None,
+        multipart_data=None,
+        **super_kwargs,
     ):
         (func, kwargs) = {
             "POST": (
@@ -70,7 +79,7 @@ class AppState(object):
             "DELETE": (requests.delete, {}),
         }[method.upper()]
 
-        return func(*args, timeout=20.0, params=params, **kwargs)
+        return func(*args, timeout=20.0, params=params, **kwargs, **super_kwargs)
 
     def api_call(self, resource_path: str, method="GET", **kwargs):
         try:
@@ -120,17 +129,22 @@ def main(config):
 @click.argument("filename", type=click.Path(exists=True))
 def upload(one_time, private, expiry, filename: Path):
     with open(filename, "rb") as f:
-        url = STATE.api_call(
-            "upload",
-            method="POST",
-            multipart_data={"file": (filename, f)},
-            form_data={
+        encoder = MultipartEncoder(
+            fields={
+                "file": (filename, f),
                 "expiry": str(expiry or -1),
                 "secret": "1" if private else "",
                 "oneTime": "1" if one_time else "",
                 "password": STATE.conf["upload_password"],
                 "source": "at-cli",
-            },
+            }
+        )
+
+        url = STATE.api_call(
+            "upload",
+            method="POST",
+            form_data=encoder,
+            headers={"Content-Type": encoder.content_type},
         )
 
         pyperclip.copy(url)
@@ -206,4 +220,3 @@ def create_bin(password: str, file_path, secret: bool):
 # TODO: List reminders, delete/modify images, phost integration(?)
 if __name__ == "__main__":
     main()
-
