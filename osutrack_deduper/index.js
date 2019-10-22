@@ -16,13 +16,13 @@ const db_creds = require('./conf');
 const dedupUser = require('./dedupUser');
 
 const connection = mysql.createConnection({
-  host     : db_creds.db_host,
-  user     : db_creds.db_user,
-  password : db_creds.db_pass,
-  database : db_creds.db_database,
+  host: db_creds.db_host,
+  user: db_creds.db_user,
+  password: db_creds.db_pass,
+  database: db_creds.db_database,
 });
 connection.connect(err => {
-  if(err) {
+  if (err) {
     console.log('Error connecting to the database: ', err);
     process.exit(1);
   } else {
@@ -31,8 +31,9 @@ connection.connect(err => {
 });
 
 // Find the number of users in the database
-const maxUserIdQuery = 'SELECT `user` from `updates` WHERE 1 ORDER BY `user` DESC LIMIT 1;';
-connection.query(maxUserIdQuery, (err, res, fields) => {
+const userOsuIdsQuery = 'SELECT `osu_id` from `users` WHERE 1 ORDER BY `osu_id` ASC;';
+connection.query(userOsuIdsQuery, (err, res, fields) => {
+  console.log(res[0]);
   // Loop through all users in the database
-  dedupUser(res[0].user, connection, 1);
+  res.map(_.property('osu_id')).forEach(osuId => dedupUser(osuId, connection));
 });
