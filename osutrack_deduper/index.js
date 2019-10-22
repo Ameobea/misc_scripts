@@ -21,6 +21,7 @@ const connection = mysql.createConnection({
   password: db_creds.db_pass,
   database: db_creds.db_database,
 });
+
 connection.connect(err => {
   if (err) {
     console.log('Error connecting to the database: ', err);
@@ -31,9 +32,15 @@ connection.connect(err => {
 });
 
 // Find the number of users in the database
-const userOsuIdsQuery = 'SELECT `osu_id` from `users` WHERE 1 ORDER BY `osu_id` ASC;';
-connection.query(userOsuIdsQuery, (err, res, fields) => {
-  console.log(res[0]);
-  // Loop through all users in the database
-  res.map(_.property('osu_id')).forEach(osuId => dedupUser(osuId, connection));
+const userOsuIdsQuery = 'SELECT `osu_id` from `users` ORDER BY `osu_id` ASC;';
+connection.query(userOsuIdsQuery, (err, res, _fields) => {
+  if (err) {
+    console.log('Error querying list of users from the database');
+    process.exit(1);
+  }
+
+  res
+    .map(_.property('osu_id'))
+    .reduce((acc, osuId) => acc.then(() => dedupUser(osuId, connection)), Promise.resolve())
+    .then(() => console.log('Done deduping!'));
 });

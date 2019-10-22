@@ -4,26 +4,38 @@
 
 const _ = require('lodash');
 
-const dedupUser = (id, connection) => {
-  // Pull down all update rows for the user form the database
-  const userQuery = `SELECT * FROM \`updates\` WHERE \`user\` = ${id} ORDER BY \`id\` ASC;`;
-  connection.query(userQuery, (err, res, fields) => {
-    // determine "duplicate" rows
-    const duplicateIds = findDuplicates(res);
-
-    // delete all duplicate rows.
-    const deleteDuplicatesQuery = `DELETE FROM \`updates\` WHERE \`id\` IN (${
-      duplicateIds && duplicateIds.length !== 0 ? duplicateIds.join(', ') : '-1'
-    });`;
-    console.log(`Deleting ${duplicateIds ? duplicateIds.length : 0} duplicate rows for user ${id}...`);
-    connection.query(deleteDuplicatesQuery, (err, res, fields) => {
+const dedupUser = (id, connection) =>
+  new Promise((f, r) => {
+    // Pull down all update rows for the user form the database
+    const userQuery = `SELECT * FROM \`updates\` WHERE \`user\` = ${id} ORDER BY \`id\` ASC;`;
+    connection.query(userQuery, (err, res, _fields) => {
       if (err) {
-        console.log(`Error while deleting duplicate rows from the database: ${err}`);
+        console.log('Error getting updates for user with id ' + id);
         process.exit(1);
       }
+
+      // determine "duplicate" rows
+      const duplicateIds = findDuplicates(res);
+
+      // delete all duplicate rows.
+      const dups = duplicateIds && duplicateIds.length !== 0 ? duplicateIds.join(', ') : null;
+      if (!dups) {
+        return f();
+      }
+      const deleteDuplicatesQuery = `DELETE FROM \`updates\` WHERE \`id\` IN (${dups});`;
+
+      connection.query(deleteDuplicatesQuery, (err, res, _fields) => {
+        if (err) {
+          console.log(`Error while deleting duplicate rows from the database: ${err}`);
+          r();
+          process.exit(1);
+        }
+
+        console.log(`Deleted ${res.affectedRows} duplicate rows for user ${id}`);
+        f();
+      });
     });
   });
-};
 
 const findDuplicates = rows => {
   var lastRow = null;
