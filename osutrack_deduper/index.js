@@ -9,6 +9,7 @@
 
 'use strict';
 
+const process = require('process');
 const mysql = require('mysql');
 const _ = require('lodash');
 
@@ -35,12 +36,15 @@ connection.connect(err => {
 const userOsuIdsQuery = 'SELECT `osu_id` from `users` ORDER BY `osu_id` ASC;';
 connection.query(userOsuIdsQuery, (err, res, _fields) => {
   if (err) {
-    console.log('Error querying list of users from the database');
+    console.log('Error querying list of users from the database: ', err);
     process.exit(1);
   }
 
   res
     .map(_.property('osu_id'))
     .reduce((acc, osuId) => acc.then(() => dedupUser(osuId, connection)), Promise.resolve())
-    .then(() => console.log('Done deduping!'));
+    .then(() => {
+      console.log('Done deduping!');
+      process.exit(0);
+    });
 });
