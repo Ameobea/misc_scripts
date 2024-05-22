@@ -1,0 +1,4 @@
+set dotenv-load := false
+
+docker-build:
+  docker build -t osutrack-exporter .
