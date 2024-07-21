@@ -65,13 +65,12 @@ class AppState(object):
         params={},
         json_body=None,
         form_data=None,
-        multipart_data=None,
         **super_kwargs,
     ):
         (func, kwargs) = {
             "POST": (
                 requests.post,
-                {"json": json_body, "files": multipart_data, "data": form_data},
+                {"json": json_body, "data": form_data},
             ),
             "GET": (requests.get, {}),
             "PUT": (requests.put, {"json": json_body}),
@@ -147,9 +146,15 @@ def upload(one_time, private, expiry, filename: Path):
             headers={"Content-Type": encoder.content_type},
         )
 
-        pyperclip.copy(url)
+        did_copy_to_clipboard = False
+        try:
+            pyperclip.copy(url)
+            did_copy_to_clipboard = True
+        except Exception:
+            pass
         print("{} {}".format(colored("File successfully uploaded:", "green"), url))
-        print("Link has been copied to the clipboard.")
+        if did_copy_to_clipboard:
+            print("Link has been copied to the clipboard.")
 
 
 @main.command()
