@@ -1,8 +1,9 @@
 use std::fs::File;
-use std::io::Read;
+use std::io::{Read, Write};
 use std::path::Path;
 use std::{collections::HashMap, path::PathBuf};
 
+use arboard::Clipboard;
 use chrono::{DateTime, TimeDelta, Utc};
 use clap::{Parser, Subcommand};
 use colored::Colorize;
@@ -80,6 +81,24 @@ fn load_conf() -> Config {
     toml::from_str(&contents).expect("Error reading config file")
 }
 
+fn copy_to_clipboard(text: &str) {
+    if cfg!(target_os = "linux") {
+        // if `xclip` is installed, use it to copy to clipboard
+        let _ = std::process::Command::new("xclip")
+            .arg("-selection")
+            .arg("clipboard")
+            .stdin(std::process::Stdio::piped())
+            .spawn()
+            .unwrap()
+            .stdin
+            .unwrap()
+            .write_all(text.as_bytes());
+    } else {
+        let mut clipboard = Clipboard::new().unwrap();
+        let _ = clipboard.set_text(text).unwrap();
+    }
+}
+
 async fn upload_command(
     conf: &Config,
     filename: &Path,
@@ -105,6 +124,7 @@ async fn upload_command(
 
     match api_call(&conf, "upload", "POST", None, None, Some(form_data)).await {
         Ok(url) => {
+            copy_to_clipboard(&url);
             println!("{} {url}", "File successfully uploaded:".green());
         }
         Err(err) => {
@@ -193,6 +213,8 @@ async fn bin_command(conf: &Config, password: &str, file_path: &Path, secret: bo
                 .expect("Could not extract bin URL")
                 .as_str();
             let bin_url = format!("{}{url_match}", conf.ameotrack_url_root);
+            let mut clipboard = Clipboard::new().unwrap();
+            let _ = clipboard.set_text(&bin_url);
             println!("{} {bin_url}", "Bin successfully created:".green());
         }
         Err(err) => {
@@ -245,7 +267,7 @@ struct Cli {
     command: Command,
 }
 
-#[tokio::main]
+#[tokio::main(flavor = "current_thread")]
 async fn main() {
     let args = Cli::parse();
 
